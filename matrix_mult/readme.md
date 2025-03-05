@@ -63,65 +63,70 @@ pip install -r requirements.txt
 ## Running with Docker
 
 ### Building the Docker Image
-bash
+```sh
 docker build -t matrix-mult-app .
+```
 
 ### Running the Docker Container
-bash
-
-Create a directory for the results
+Create a directory for the results:
+```sh
 mkdir -p results
+```
 
-Run the container with volume mounting
+Run the container with volume mounting:
+```sh
 docker run -p 5000:5000 -v $(pwd)/results:/app/results matrix-mult-app
+```
 
 ### Testing the Docker Container
-bash
+```sh
 curl -X POST http://localhost:5000/multiply \
 -H "Content-Type: application/json" \
 -d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]]}'
-
+```
 
 ## Deploying with Kubernetes
 
 ### Step 1: Load the Docker Image into Minikube
-bash
-
-##For Minikube
+For Minikube:
+```sh
 minikube image load matrix-mult-app
-
+```
 
 ### Step 2: Create the Kubernetes Resources
-
-bash
+```sh
 kubectl apply -f deployment/matrix-app-pvc.yaml
 
 kubectl apply -f deployment/matrix-app-deployment.yaml
 
 kubectl apply -f deployment/matrix-app-service.yaml
-
-
+```
 
 ### Step 3: Verify the Deployment
-
-bash
+```sh
 kubectl get pods
 
 kubectl get service matrix-multiply-service
-
+```
 
 ### Getting the Service URL (Minikube)
-bash
+```sh
 minikube service matrix-multiply-service --url
+```
 
-
-### Sending a Matrix Multiplication Requestbash
+### Sending a Matrix Multiplication Request
+```sh
 curl -X POST http://SERVICE_URL/multiply \
 -H "Content-Type: application/json" \
 -d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]]}'
+```
 
-List files in the results directory
+### List files in the results directory
+```sh
 kubectl exec -it POD_NAME -- /bin/sh -c "ls -la /app/results"
+```
 
-View a specific file
+### View a specific file
+```sh
 kubectl exec -it POD_NAME -- /bin/sh -c "cat /app/results/matrix_multiply_results_TIMESTAMP.txt"
+
