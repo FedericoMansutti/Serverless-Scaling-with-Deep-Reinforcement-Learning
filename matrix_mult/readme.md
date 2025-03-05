@@ -40,7 +40,7 @@ matrix-multiplication-service/
 │   ├── matrix-app-service.yaml     # Service configuration
 │   └── matrix-app-pvc.yaml         # Persistent Volume Claim
 └── README.md                  # This file
-
+```
 ## Getting Started
 
 ### Prerequisites
