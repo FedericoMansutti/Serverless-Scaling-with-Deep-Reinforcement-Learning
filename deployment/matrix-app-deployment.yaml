@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: matrix-multiply
+  labels:
+    app: matrix-multiply
+spec:
+  replicas: 3  # This creates 3 copies of your application
+  selector:
+    matchLabels:
+      app: matrix-multiply
+  template:
+    metadata:
+      labels:
+        app: matrix-multiply
+    spec:
+      containers:
+      - name: matrix-multiply
+        image: matrix-mult-app
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: results-volume
+          mountPath: /app/results
+      volumes:
+      - name: results-volume
+        persistentVolumeClaim:
+          claimName: matrix-results-pvc

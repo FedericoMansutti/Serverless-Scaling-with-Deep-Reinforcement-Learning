@@ -1,0 +1,123 @@
+# Matrix Multiplication Service with Kubernetes
+
+This repository contains a Flask-based matrix multiplication service that can be deployed as a Docker container and scaled with Kubernetes.
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Project Structure](#project-structure)
+3. [Getting Started](#getting-started)
+4. [Running with Docker](#running-with-docker)
+5. [Deploying with Kubernetes](#deploying-with-kubernetes)
+6. [Using the API](#using-the-api)
+7. [Accessing Results](#accessing-results)
+8. [Troubleshooting](#troubleshooting)
+
+## Overview
+
+This project provides a web service that multiplies matrices. You send two matrices in a JSON format, and the service:
+- Multiplies them using NumPy
+- Saves the results to a file
+- Returns information about the calculation
+
+The service is built with:
+- **Flask**: A lightweight web framework for Python
+- **NumPy**: For fast matrix operations
+- **Docker**: For containerization
+- **Kubernetes**: For scaling and managing the application
+
+## Project Structure
+matrix-multiplication-service/
+├── matrix_multiply.py # Flask application for matrix multiplication
+├── requirements.txt # Python dependencies
+├── Dockerfile # Instructions to build the Docker image
+├── deployment/ # Kubernetes configuration files
+│ ├── matrix-app-deployment.yaml # Deployment configuration
+│ ├── matrix-app-service.yaml # Service configuration
+│ └── matrix-app-pvc.yaml # Persistent Volume Claim
+└── README.md # This file
+
+## Getting Started
+
+### Prerequisites
+
+- Python 3.8+
+- Docker
+- Kubernetes cluster (Minikube for local testing)
+
+### Installation
+
+1. Clone this repository:
+bash
+git clone https://github.com/yourusername/matrix-multiplication-service.git
+cd matrix-multiplication-service
+
+2. Install Python dependencies:
+bash
+pip install -r requirements.txt
+
+## Running with Docker
+
+### Building the Docker Image
+bash
+docker build -t matrix-mult-app .
+
+### Running the Docker Container
+bash
+
+Create a directory for the results
+mkdir -p results
+
+Run the container with volume mounting
+docker run -p 5000:5000 -v $(pwd)/results:/app/results matrix-mult-app
+
+### Testing the Docker Container
+bash
+curl -X POST http://localhost:5000/multiply \
+-H "Content-Type: application/json" \
+-d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]]}'
+
+
+## Deploying with Kubernetes
+
+### Step 1: Load the Docker Image into Minikube
+bash
+
+##For Minikube
+minikube image load matrix-mult-app
+
+
+### Step 2: Create the Kubernetes Resources
+
+bash
+kubectl apply -f deployment/matrix-app-pvc.yaml
+
+kubectl apply -f deployment/matrix-app-deployment.yaml
+
+kubectl apply -f deployment/matrix-app-service.yaml
+
+
+
+### Step 3: Verify the Deployment
+
+bash
+kubectl get pods
+
+kubectl get service matrix-multiply-service
+
+
+### Getting the Service URL (Minikube)
+bash
+minikube service matrix-multiply-service --url
+
+
+### Sending a Matrix Multiplication Requestbash
+curl -X POST http://SERVICE_URL/multiply \
+-H "Content-Type: application/json" \
+-d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]]}'
+
+List files in the results directory
+kubectl exec -it POD_NAME -- /bin/sh -c "ls -la /app/results"
+
+View a specific file
+kubectl exec -it POD_NAME -- /bin/sh -c "cat /app/results/matrix_multiply_results_TIMESTAMP.txt"
