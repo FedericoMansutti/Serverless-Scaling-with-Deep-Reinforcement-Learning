@@ -15,27 +15,31 @@ This repository contains a Flask-based matrix multiplication service that can be
 
 ## Overview
 
-This project provides a web service that multiplies matrices. You send two matrices in a JSON format, and the service:
-- Multiplies them using NumPy
-- Saves the results to a file
-- Returns information about the calculation
+This project provides a RESTful web service for multiplying matrices. When you send two matrices in JSON format, the service:
+- **Multiplies them** using **NumPy**
+- **Saves the results** to a file
+- **Returns calculation details**
 
-The service is built with:
-- **Flask**: A lightweight web framework for Python
-- **NumPy**: For fast matrix operations
-- **Docker**: For containerization
-- **Kubernetes**: For scaling and managing the application
+**Technologies Used:**
+- **Flask**: Lightweight web framework for Python.
+- **NumPy**: Fast matrix operations.
+- **Docker**: Containerization for consistent environments.
+- **Kubernetes**: Orchestration and scaling of containerized applications.
+
+---
 
 ## Project Structure
+
+```plaintext
 matrix-multiplication-service/
-├── matrix_multiply.py # Flask application for matrix multiplication
-├── requirements.txt # Python dependencies
-├── Dockerfile # Instructions to build the Docker image
-├── deployment/ # Kubernetes configuration files
-│ ├── matrix-app-deployment.yaml # Deployment configuration
-│ ├── matrix-app-service.yaml # Service configuration
-│ └── matrix-app-pvc.yaml # Persistent Volume Claim
-└── README.md # This file
+├── matrix_multiply.py         # Flask application for matrix multiplication
+├── requirements.txt           # Python dependencies
+├── Dockerfile                 # Docker build instructions
+├── deployment/                # Kubernetes configuration files
+│   ├── matrix-app-deployment.yaml  # Deployment configuration
+│   ├── matrix-app-service.yaml     # Service configuration
+│   └── matrix-app-pvc.yaml         # Persistent Volume Claim
+└── README.md                  # This file
 
 ## Getting Started
 
