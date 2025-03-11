@@ -30,6 +30,7 @@ def multiply_matrices():
 
         A = np.array(data['matrix_a'], dtype = float)
         B = np.array(data['matrix_b'], dtype = float)
+        requestTime = data['startTime']
         
         # Validate matrices can be multiplied
         if A.shape[1] != B.shape[0]:
@@ -45,8 +46,12 @@ def multiply_matrices():
         # Perform matrix multiplication
         C = matrix_multiply(A, B)
         
-        # Calculate execution time
-        execution_time = time.time() - start_time
+        endTime = time.time()
+
+        # Compute the response and service time
+        
+        seriviceTime = endTime - start_time
+        responseTime = endTime - requestTime
 
         # Generate a unique filename based on timestamp
         filename = f"{podName}_{timestamp}.txt"
@@ -59,7 +64,8 @@ def multiply_matrices():
 
             # f.write(f"Matrix multiplication of {A.shape}x{B.shape} matrices completed.\n")
             
-            f.write(f"Execution time: {execution_time:.4f} seconds\n\n")
+            f.write(f"Service Time: {seriviceTime:.9f} seconds\n\n")
+            f.write(f"Response Time: {responseTime:.9f} seconds\n\n")
             
             # Write a sample of the result matrix (top-left 5x5)
             # f.write("Sample of result matrix (top-left 5x5):\n")
@@ -70,7 +76,7 @@ def multiply_matrices():
         # Return results
         return jsonify({
             'message': f"Matrix multiplication completed. Results saved to {filepath}",
-            'execution_time': execution_time,
+            'execution_time': seriviceTime,
             'result_shape': C.shape,
             'result_sample': C[:5, :5].tolist() if min(C.shape) >= 5 else C.tolist()
         })
