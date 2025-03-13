@@ -116,9 +116,7 @@ minikube service matrix-multiply-service --url
 Tip: since this cannot be started in detatched mode, you can use tmux to start it
 ### Sending a Matrix Multiplication Request
 ```sh
-curl -X POST http://SERVICE_URL/multiply \
--H "Content-Type: application/json" \
--d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]]}'
+curl -X POST http://SERVICE_URL/multiply -H "Content-Type: application/json" -d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]], "startTime": '$(date +%s)'}'
 ```
 
 ### List files in the results directory
