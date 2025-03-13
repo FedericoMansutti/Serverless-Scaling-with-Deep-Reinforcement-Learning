@@ -88,7 +88,7 @@ curl -X POST http://localhost:5000/multiply \
 ## Deploying with Kubernetes
 
 ### Step 1: Load the Docker Image into Minikube
-For Minikube:
+For Minikube (remember to start minikube with minikube start):
 ```sh
 minikube image load matrix-mult-app
 ```
@@ -113,7 +113,7 @@ kubectl get service matrix-multiply-service
 ```sh
 minikube service matrix-multiply-service --url
 ```
-
+Tip: since this cannot be started in detatched mode, you can use tmux to start it
 ### Sending a Matrix Multiplication Request
 ```sh
 curl -X POST http://SERVICE_URL/multiply \
