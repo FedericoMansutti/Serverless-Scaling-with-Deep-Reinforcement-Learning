@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: autoscaler
+spec:
+  schedule: "*/1 * * * *"                           # Runs every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: autoscaler-sa         # Use the dedicated service account
+          containers:
+          - name: autoscaler
+            image: scheduler-app
+            imagePullPolicy: Never
+            env:
+            - name: DEPLOYMENT_NAME
+              value: "matrix-multiply"
+            - name: NAMESPACE
+              value: "default"
+            volumeMounts:
+            - name: results-volume
+              mountPath: /app/results
+          volumes:
+          - name: results-volume
+            persistentVolumeClaim:
+              claimName: matrix-results-pvc
+          restartPolicy: OnFailure
+
+
+# The scema for the schedule is: * (Minute) * (Hour) * (Day of the month) * (Month) * (Day of the week)

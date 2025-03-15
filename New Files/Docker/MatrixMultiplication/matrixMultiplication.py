@@ -2,6 +2,7 @@ import numpy as np
 import time
 import datetime
 import os
+import json
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
@@ -50,33 +51,30 @@ def multiply_matrices():
 
         # Compute the response and service time
         
-        seriviceTime = endTime - start_time
+        serviceTime = endTime - start_time
         responseTime = endTime - requestTime
 
         # Generate a unique filename based on timestamp
-        filename = f"{podName}_{timestamp}.txt"
+        filename = f"{podName}_{timestamp}.json"
         filepath = os.path.join("results", filename)
-        
-        # Write results to file
-        with open(filepath, "w") as f:
-            
-            # For our purposes, we are only interested in the execution time
 
-            # f.write(f"Matrix multiplication of {A.shape}x{B.shape} matrices completed.\n")
-            
-            f.write(f"Service Time: {seriviceTime:.9f} seconds\n\n")
-            f.write(f"Response Time: {responseTime:.9f} seconds\n\n")
-            
-            # Write a sample of the result matrix (top-left 5x5)
-            # f.write("Sample of result matrix (top-left 5x5):\n")
-            # for i in range(C.shape[0]):
-            #    row_str = " ".join([f"{val:.6f}" for val in C[i, :]])
-            #    f.write(row_str + "\n")
+        # Prepare data for JSON output
+        data = {
+
+            "Service Time": round(serviceTime, 9),
+            "Response Time": round(responseTime, 9)
+        
+        }
+
+        # Write results to JSON file
+        with open(filepath, "w") as f:
+
+            json.dump(data, f, indent = 4)
         
         # Return results
         return jsonify({
             'message': f"Matrix multiplication completed. Results saved to {filepath}",
-            'execution_time': seriviceTime,
+            'execution_time': serviceTime,
             'result_shape': C.shape,
             'result_sample': C[:5, :5].tolist() if min(C.shape) >= 5 else C.tolist()
         })
