@@ -144,23 +144,20 @@ def main():
     
     # Process all the result files and compute the average response time
     avgResponseTime = getAverageResponseTime()
-
-    if avgResponseTime is not None:
-
-        # Determine desired replicas based on the scaling logic
-        if avgResponseTime > 200:
-            replicas = 5
-
-        elif avgResponseTime < 100:
-            replicas = 2
-        
-        else:
-            replicas = 1
-
-        updateReplicasNumber(deploymentName, namespace, replicas)
+    currentReplicas = len(getCurrentPodNames(namespace))
     
+    if avgResponseTime is None:
+
+        replicas = currentReplicas - 1 if currentReplicas > 1 else 1
+
+    elif avgResponseTime > 0.6:
+        
+        replicas = currentReplicas + 1
+
     else:
-        print("No response time data found.")
+        replicas = currentReplicas - 1 if currentReplicas > 1 else 1
+
+    updateReplicasNumber(deploymentName, namespace, replicas)
     
     #Move processed files to the AnalyzedPods folder
     moveAnalyzedFiles()
