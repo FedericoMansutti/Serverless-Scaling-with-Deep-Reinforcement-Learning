@@ -127,3 +127,22 @@ pip install -r requirements.txt
    Important: 
    - The third command can be used only after the first run of the scheduler, otherwise no shuch a file would exist
 <br></br>
+
+## Test the scaler with JMeter
+
+1. **Start JMeter and open the `JMeter/jmeter.jmx` file**
+
+   ```
+   sh JMeterAppFolder/bin/jmeter.sh
+   ```
+
+   Important: Change the port number in the file, the port used by Minikube will change at every run!
+   <br></br>
+
+2. **Run the test**: try to run it after the first check to observe how the replicas number changes
+
+<p align="center">
+  <img src="Images/Check%201.png" alt="First Check" width="30%">
+  <img src="Images/Check%202.png" alt="Second Check" width="30%">
+  <img src="Images/Check%203.png" alt="Third Check" width="30%">
+</p>
