@@ -141,11 +141,21 @@ pip install -r requirements.txt
 
 2. **Run the test**: try to run it after the first check to observe how the replicas number changes
 
-<p align="center">
-  <img src="Images/Check%201.png" alt="First Check" width="30%">
-  <img src="Images/Check%202.png" alt="Second Check" width="30%">
-  <img src="Images/Check%203.png" alt="Third Check" width="30%">
-</p>
+<div align="center">
+  
+  <div style="display: flex; justify-content: center; gap: 10px;">
+    <img src="Images/Check%201.png" alt = "First Check" width = "30%">
+    <img src="Images/Check%202.png" alt = "Second Check" width = "30%">
+    <img src="Images/Check%203.png" alt = "Third Check" width = "30%">
+  </div>
+
+  
+  <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+    <img src="Images/Check%204.png" alt = "Fourth Check" width = "30%">
+    <img src="Images/Check%205.png" alt = "Fifth Check" width = "30%">
+    <img src="Images/Check%206.png" alt = "Sixth Check" width = "30%">
+  </div>
+</div>
 
 
 ## Monitoring the system

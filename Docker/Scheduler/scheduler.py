@@ -77,7 +77,7 @@ def getCurrentPodNames(namespace, labelSelector = "app=matrix-multiply"):
     return {pod.metadata.name for pod in pods.items}
 
 
-def updatePodStatus(namespace, avgResponseTime):
+def updatePodStatus(namespace, avgResponseTime, action):
 
     # Get current active pods
     currentPods = getCurrentPodNames(namespace)
@@ -118,11 +118,13 @@ def updatePodStatus(namespace, avgResponseTime):
         previousActive = set()
         started = list(currentPods)             # All pods are new in check_1
         shutdown = []
+        action = 'No Action'
     
     newStatus = {
 
         "timestamp": datetime.now().strftime("%d.%m.%Y_%H:%M:%S"),
         "averageResponseTime": avgResponseTime,
+        "action": action,
         "active": list(currentPods),
         "started": started,
         "shutdown": shutdown
@@ -149,13 +151,21 @@ def main():
     if avgResponseTime is None:
 
         replicas = currentReplicas - 1 if currentReplicas > 1 else 1
+        
+        if currentReplicas == 1:
+            action = 'No Action'
+
+        else: 
+            action = 'Shutdown a pod'
 
     elif avgResponseTime > 0.6:
         
         replicas = currentReplicas + 1
+        action = 'Start a new pod'
 
     else:
         replicas = currentReplicas - 1 if currentReplicas > 1 else 1
+        action = 'Shutdown a pod'
 
     updateReplicasNumber(deploymentName, namespace, replicas)
     
@@ -163,7 +173,7 @@ def main():
     moveAnalyzedFiles()
     
     # Update the pod status file with active, started and shutdown pods
-    updatePodStatus(namespace, avgResponseTime)
+    updatePodStatus(namespace, avgResponseTime, action)
 
 
 if __name__ == "__main__":
