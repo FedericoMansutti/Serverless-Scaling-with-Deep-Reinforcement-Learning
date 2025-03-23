@@ -146,3 +146,79 @@ pip install -r requirements.txt
   <img src="Images/Check%202.png" alt="Second Check" width="30%">
   <img src="Images/Check%203.png" alt="Third Check" width="30%">
 </p>
+
+
+## Monitoring the system
+
+Before proceeding, install the required libraries:
+   
+   ```
+   brew install kubernetes-helm
+   ```
+
+We will use:
+   -  NodeExporter: collects system-level metrics, such as CPU, memory, disk I/O, network usage, etc., from the underlying host 
+   - cAdvisor: it automatically collects container-level metrics so as to provide detailed insights into the resource usage for each pod
+   - Blackbox Exporter: it analyzes endpoints (e.g. the service’s HTTP endpoint) to measures metric such as response time and availability
+
+1. **Add helm repos and update**
+
+   ```
+   helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+   helm repo add grafana https://grafana.github.io/helm-charts
+   helm repo update
+   ```
+
+2. **Deploy the kube-prometheus-stack**: through this installation, we are automatically setting up NodeExporter, cAdvisor and a fully functional Grafana instance with pre-built dashboards for kubernetes metrics.
+
+   ```
+   helm install monitoring prometheus-community/kube-prometheus-stack --namespace monitoring --create-namespace
+   ```
+
+   Important: The Kubernetes Cluster must be active in this phase, otherwise the process would not work!
+
+3. **Deploy the Blackbox Exporter**
+
+   ```
+   helm install blackbox-exporter prometheus-community/prometheus-blackbox-exporter --namespace monitoring
+   ```
+
+4. **Create a Prob Job**
+
+   ```
+   kubectl apply -f Kubernetes/Prometheus/blackbox-probe.yaml
+   ```
+
+   Important: This would not work with our actual app since it performs a get request to the endpoint to observe the performance.
+   But it should be useful for the real application we will use at the end!
+
+5. **Expose the Prometheus and Grafana Services**
+
+   ```
+   # Prometheus
+   kubectl port-forward svc/monitoring-kube-prometheus-prometheus -n monitoring 9090
+
+   # Grafana
+   # Username: admin
+   # Password: kubectl get secret monitoring-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+   kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
+   ```
+6. **Access the Services**
+
+   ```
+   Prometheus: http://localhost:9090
+
+   Grafana: http://localhost:3000
+   ```
+
+7. **Add the Prometheus Service on Grafana**:
+
+   Connections -> Data sources -> Add new data source -> Time series databases -> Connection: http://monitoring-kube-prometheus-prometheus.monitoring:9090 -> Save & Test
+   
+
+8. **Import the custom dashboard on Grafana**: Dashboards -> New -> Import -> `Grafana/dashboard.json`
+
+   <p align = "center">
+   <img src = "Images/Grafana Performance.png" alt = "Grafaba" width = "80%">
+   </p>
