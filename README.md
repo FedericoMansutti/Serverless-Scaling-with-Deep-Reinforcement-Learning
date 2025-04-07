@@ -90,6 +90,7 @@ pip install -r requirements.txt
    kubectl apply -f Kubernetes/MatrixMultiplication/pvc.yaml
    kubectl apply -f Kubernetes/MatrixMultiplication/deployment.yaml
    kubectl apply -f Kubernetes/MatrixMultiplication/service.yaml
+   kubectl apply -f Kubernetes/MatrixMultiplication/ingress.yaml
    ```
 
    ```
@@ -100,23 +101,41 @@ pip install -r requirements.txt
    ```
 
    Important: 
-   - If you want to observe the effects of the scheduler in a clearer way, apply its manifest after some requests sent during the steps 3/4
+   - Ensure you execute these commands in the given sequence to maintain proper resource dependencies
+   - If you want to observe the effects of the scheduler in a clearer way, apply its manifest after some requests sent during the following steps
                <br></br>
-3. **Get the URL**: returns a URL in the format `http://<minikube-ip>:<port>`
 
-   ```
-   minikube service matrix-multiply-service --url
-   ```
-<br></br>
 
-4. **Send the Request**
+3. **Enable the Ingress Controller**
 
+   ```shell
+   minikube addons enable ingress
+   
+   # You can also check the ingress status (ingress-nginx-controller should be in Running)
+   kubectl get pods -n ingress-nginx
    ```
-   curl -X POST http://SERVICE_URL/multiply -H "Content-Type: application/json" -d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]], "startTime": '$(date +%s)'}'
-   ```
-<br></br>
 
-5. **Access the Results**
+4. **Configure the NGINX Ingress to Allow Custom Headers**: by default, the NGINX Ingress controller blocks custom snippets 
+
+   ```shell
+   # Edit the ConfigMap (This opens the configuration in a text editor, typically VIM)
+   kubectl patch configmap ingress-nginx-controller -n ingress-nginx --type merge -p '{"data":{"allow-snippet-annotations":"true"}}'
+   ```
+
+5. **Start Minikube Tunnel**
+
+   ```shell
+   minikube tunnel 
+   ```
+
+6. **Send the Request**: perform a request to the server to check whether it is working or not
+
+   ```shell
+   curl -X POST http://127.0.0.1/multiply -H "Content-Type: application/json" -d '{"matrix_a": [[1,2],[3,4]], "matrix_b": [[5,6],[7,8]]}'
+   ```
+<br>
+
+7. **Access the Results**
 
    ```
    kubectl exec -it POD_NAME -- /bin/sh -c "ls /app/results"
@@ -128,18 +147,57 @@ pip install -r requirements.txt
    - The third command can be used only after the first run of the scheduler, otherwise no shuch a file would exist
 <br></br>
 
-## Test the scaler with JMeter
+## Testing the Scaler with JMeter
 
-1. **Start JMeter and open the `JMeter/jmeter.jmx` file**
+1. **Configure the JMeter Test Plan**: open the notebook `WorkloadAndConfigGenerator.ipynb`. This will allow you to generate the desired workload (currently, only a sinusoidal pattern is supported) and, once the workload is generated, configure the following parameters:
 
+   ```text
+   # Workload
+   It defines the path to the generated workload file
+
+   # Concurrency Values
+   TargetLevel = Number of concurrent users. Set this high enough to support the throughput defined in the Throughput Shaping Timer (there is a mathematical formula to compute it but in general we can use this naive approach)
+   RampUp = Time (in minutes) to gradually add users until the TargetLevel is reached
+   Steps = Number of incremental steps to reach the TargetLevel
+   Hold = Duration (in minutes) to maintain the peak user load. This should match the observation time
+
+   # HTTP Request
+   HTTPSampler.domain = Domain to send the requests to
+   HTTPSampler.port = Port to use (must remain set to 80 for tests to work)
+   HTTPSampler.path = Endpoint path
+   HTTPSampler.method = HTTP method (e.g., POST, GET, etc...)
+   jsonBody = Payload for the POST request
+
+   # CSV File Upload (about the Matrices to send in the requests)
+   delimiter = Delimiter used used in the Matrices.csv file
+   fileEncoding = Encoding of the CSV file
+   filename = Path to the Matrices.csv file
+   variableNames = Column headers in the CSV file
+   shareMode = Scope of file sharing among threads
+   ignoreFirstLine = it specify whether we have to consider the first row of the Matrices.csv file or not (spoiler: we have to do it)
+   recycle = Set to true to reuse rows when requests exceed the file length
+   stopThread = Set to false to prevent threads from stopping if the file ends
    ```
+
+    Important Plugins Required:
+
+     - JMeter Plugin Manager
+     - Custom Thread Group Plugin
+     - Throughput Shaping Timer Plugin
+                  
+
+    Manual Edits: If you modify the configuration manually, preserve proper indentation to avoid test failures.
+
+2. **Launch JMeter and Load the Test Plan**
+
+   ```shell
    sh JMeterAppFolder/bin/jmeter.sh
    ```
 
-   Important: Change the port number in the file, the port used by Minikube will change at every run!
+   Important: Ensure the port number remains set to 80, changing it will cause the requests to fail.
    <br></br>
 
-2. **Run the test**: try to run it after the first check to observe how the replicas number changes
+3. **Run the Test** <br><br>
 
 <div align="center">
   

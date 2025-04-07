@@ -20,8 +20,13 @@ def matrix_multiply(A, B):
 @app.route('/multiply', methods = ['POST'])
 def multiply_matrices():
     
-    # As soon as the request arrives, we register the timestamp
-    timestamp = datetime.datetime.now().strftime("%Y.%m.%d_%H:%M:%S")
+    # As soon as the request arrives, we register the timestamp (we consider the milliseconds as well
+    # to avoid that fast responses will overwrite the files)
+    timestamp = datetime.datetime.now().strftime("%Y.%m.%d_%H:%M:%S.%f")[:-3]
+
+    # We take the time in which the ingress received the request
+    requestTimeValue = request.headers.get('requestTime')
+    requestTime = float(requestTimeValue.lstrip('t='))
 
     # Get JSON data from request
     data = request.get_json()
@@ -31,7 +36,6 @@ def multiply_matrices():
 
         A = np.array(data['matrix_a'], dtype = float)
         B = np.array(data['matrix_b'], dtype = float)
-        requestTime = data['startTime']
         
         # Validate matrices can be multiplied
         if A.shape[1] != B.shape[0]:
@@ -61,8 +65,8 @@ def multiply_matrices():
         # Prepare data for JSON output
         data = {
 
-            "Service Time": round(serviceTime, 9),
-            "Response Time": round(responseTime, 9)
+            "Service Time": round(serviceTime, 12),
+            "Response Time": round(responseTime, 12)
         
         }
 

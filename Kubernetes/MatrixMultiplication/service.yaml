@@ -8,4 +8,4 @@ spec:
   ports:
   - port: 80            # External port
     targetPort: 5050    # Internal port
-  type: LoadBalancer 
+  type: ClusterIP 
