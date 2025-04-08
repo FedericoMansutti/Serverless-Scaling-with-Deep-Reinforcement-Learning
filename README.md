@@ -85,8 +85,8 @@ scripts/
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/matrix-testing.git
-   cd matrix-testing
+   git clone https://github.com/FedericoMansutti/Serverless-Scaling-with-Deep-Reinforcement-Learning.git
+   cd Serverless-Scaling-with-Deep-Reinforcement-Learning
    ```
 
 2. Make the scripts executable:
