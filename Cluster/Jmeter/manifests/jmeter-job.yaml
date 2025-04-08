@@ -9,6 +9,7 @@ spec:
       - name: jmeter
         image: jmeter:latest  # Replace with your registry path
         command: ["/bin/bash", "/config/run-test.sh"]
+        imagePullPolicy: Never
         env:
         - name: TEST_PLAN
           value: "jmeter.jmx"  # Replace with your actual test plan name
@@ -22,7 +23,7 @@ spec:
             memory: "512Mi"
             cpu: "1"
           limits:
-            memory: "10Mi"
+            memory: "1Gi"
             cpu: "2" #maxmimum of two cores used
       volumes:
       - name: config-volume
