@@ -187,24 +187,6 @@ The system uses two Persistent Volume Claims (PVCs):
    - Can be extracted using the `get_results.sh` script
 
 ## Troubleshooting
-
-### Common Issues
-
-1. **Images not found in Minikube**
-   - Make sure to run `minikube image load` for each image
-   - Check image names match exactly in the deployment files
-
-2. **PVC not binding**
-   - Ensure your Kubernetes cluster has a default StorageClass
-   - Check status with `kubectl get pvc`
-
-3. **Services not communicating**
-   - Verify service discovery with the correct namespace
-   - Check network policies if enabled
-
-4. **Low performance**
-   - Increase Minikube resources: `minikube start --cpus=4 --memory=8192`
-
 ### Viewing Logs
 
 To view logs from any component:
