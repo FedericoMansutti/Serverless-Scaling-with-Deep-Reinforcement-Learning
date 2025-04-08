@@ -105,26 +105,6 @@ scripts/
    - Load the images into Minikube
    - Apply all Kubernetes manifests
 
-### Running Tests
-
-The JMeter test will run automatically as a Kubernetes Job after setup. To check the status:
-
-```bash
-kubectl get jobs
-```
-
-To see the logs from the JMeter job:
-
-```bash
-kubectl logs job/jmeter-test
-```
-
-To observe the autoscaling in action:
-
-```bash
-kubectl get pods -w
-```
-
 ### Retrieving Results
 
 To retrieve the JMeter test results:
