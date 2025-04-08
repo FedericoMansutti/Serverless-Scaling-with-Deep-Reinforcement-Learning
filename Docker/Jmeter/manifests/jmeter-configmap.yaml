@@ -6,8 +6,8 @@ data:
   # This is where we'd store test plan specifics or configuration overrides
   test-config.properties: |
     # Target service using K8s DNS
-    target_host=my-service.default.svc.cluster.local
-    target_port=5050
+    target_host=matrix-multiply-service.default.svc.cluster.local
+    target_port=80
     threads=10
     rampup=30
     duration=300
