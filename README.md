@@ -6,10 +6,6 @@ This project demonstrates a complete Kubernetes infrastructure for testing, scal
 2. **Autoscaler**: A scheduler that monitors performance and scales the service based on response times
 3. **JMeter Load Tester**: A performance testing tool that generates load against the service
 
-## System Architecture
-
-![System Architecture](https://raw.githubusercontent.com/yourusername/matrix-testing/main/architecture.png)
-
 ### Components and Their Interactions
 
 #### Matrix Multiplication Service
