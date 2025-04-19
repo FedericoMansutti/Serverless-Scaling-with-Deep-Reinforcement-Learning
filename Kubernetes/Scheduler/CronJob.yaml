@@ -4,7 +4,11 @@ metadata:
   name: autoscaler
 spec:
   schedule: "*/1 * * * *"                           # Runs every minute
-  jobTemplate:
+  concurrencyPolicy: Forbid                         # Prevents new job if previous is still running
+  successfulJobsHistoryLimit: 1                     # Keep only 1 successful job history
+  failedJobsHistoryLimit: 1                         # Keep only 1 failed job history
+  startingDeadlineSeconds: 10 
+  jobTemplate:  
     spec:
       template:
         spec:
@@ -18,6 +22,16 @@ spec:
               value: "matrix-multiply"
             - name: NAMESPACE
               value: "default"
+              # It will be used for the computation of the pressure, at the moment we are assuming that it is equal to 1 second
+            - name: PRESSURE_THRESHOLD                       
+              value: "1"
+              # It will be used for the computation of the utilization, where we need of the arrival rate
+            - name: INTERVAL_CHECK                  
+              value: "60"     
+            - name: AGENT_HOST                 # Put the service name of the agent     
+              value: "dqn-agent"   
+            - name: AGENT_PORT                 # Put the port in which teh agent is reachable 
+              value: "5000"             
             volumeMounts:
             - name: results-volume
               mountPath: /app/results

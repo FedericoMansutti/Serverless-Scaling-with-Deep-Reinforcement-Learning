@@ -2,6 +2,7 @@ import os
 import glob
 import json
 import shutil
+import requests
 from datetime import datetime
 from kubernetes import client, config
 
@@ -11,12 +12,20 @@ ANALYZED_DIR = os.path.join(RESULTS_DIR, "AnalyzedPods")
 POD_STATUS_FILE = os.path.join(RESULTS_DIR, "podStatus.json")
 
 
-def getAverageResponseTime():
+def getData():
+
+    # Take the info about the check rate for the computation of the utilization metric
+    interval = int(os.getenv("INTERVAL_CHECK", "60"))
 
     # List all the JSON files in the results folder (ignoring the podStatus.json)
     filePattern = os.path.join(RESULTS_DIR, "*.json")
     files = glob.glob(filePattern)
+
     responseTimes = []
+    dataPerPod = {}
+    queueLengths = {}
+    utilizationSum = 0.0
+    workload = 0.0
     
     for file in files:
 
@@ -26,17 +35,42 @@ def getAverageResponseTime():
         try:
 
             with open(file, "r") as f:
-
+                
                 data = json.load(f)
+                
+                fileName = os.path.basename(file)
+                pod, _ = fileName.split("_", 1)               # Since the filename is <pod>_<timestamp>.json
+            
+                STime, RTime = data["Service Time"], data["Response Time"]
+                dataPerPod.setdefault(pod, []).append((STime, RTime))
+                
                 responseTimes.append(data["Response Time"])
 
         except Exception as e:
             print(f"Error reading {file}: {e}")
     
-    if responseTimes:
-        return sum(responseTimes) / len(responseTimes)
     
-    return None
+    for pod, list in dataPerPod.items():
+    
+        # Compute data for the queueLengthDominant metric
+        qVals = [(r - s) / s for s, r in list]
+        queueLengths[pod] = sum(qVals) / len(qVals)
+
+        # Compute data for the utilization metric
+        lamdaI = len(list) / interval
+        demandI = sum(s for s, _ in list) / len(list)
+        utilizationSum += lamdaI * demandI
+
+        workload += lamdaI
+
+
+    queueLengthDominant = max(queueLengths.values()) if queueLengths else 0
+    averageResponseTime = sum(responseTimes) / len(responseTimes) if responseTimes else 0
+    u = utilizationSum if utilizationSum else 0
+    w = workload if workload else 0
+
+    
+    return averageResponseTime, queueLengthDominant, u, w
 
 
 def updateReplicasNumber(deploymentName, namespace, replicas):
@@ -77,7 +111,7 @@ def getCurrentPodNames(namespace, labelSelector = "app=matrix-multiply"):
     return {pod.metadata.name for pod in pods.items}
 
 
-def updatePodStatus(namespace, avgResponseTime, action):
+def updatePodStatus(namespace, observation, action):
 
     # Get current active pods
     currentPods = getCurrentPodNames(namespace)
@@ -112,22 +146,29 @@ def updatePodStatus(namespace, avgResponseTime, action):
         previousActive = set(history[f"check_{lastCheck}"].get("active", []))
         started = list(currentPods - previousActive)
         shutdown = list(previousActive - currentPods)
+        act = 'No Action' if action == -1 else f"The number of pod should be {action}"
 
     else:
 
         previousActive = set()
         started = list(currentPods)             # All pods are new in check_1
         shutdown = []
-        action = 'No Action'
+        act = 'No Action'
     
     newStatus = {
 
         "timestamp": datetime.now().strftime("%d.%m.%Y_%H:%M:%S"),
-        "averageResponseTime": avgResponseTime,
-        "action": action,
+        "nInstances": observation['n_instances'],
+        "pressure": observation['pressure'],
+        "avgResponseTime": observation['avgResponseTime'],
+        "Threshold": observation['Threshold'], 
+        "queueLengthDominant": observation['queue_length_dominant'],
+        "utilization": observation['utilization'],
+        "workload": observation['workload'],
+        "action": act,
         "active": list(currentPods),
-        "started": started,
-        "shutdown": shutdown
+        "startedPreviousCheck": started,
+        "shutdownPreviousCheck": shutdown
     }
     
     # Record the new check into history
@@ -143,37 +184,74 @@ def main():
     # Values provided via environment variables in the CronJob spec
     namespace = os.environ.get("NAMESPACE", "default")
     deploymentName = os.environ.get("DEPLOYMENT_NAME", "matrix-multiply")
+    threshold = float(os.getenv("PRESSURE_THRESHOLD", "0.6"))
+    agentURL = f"http://{os.getenv('AGENT_HOST')}:{os.getenv('AGENT_PORT')}/action"
     
     # Process all the result files and compute the average response time
-    avgResponseTime = getAverageResponseTime()
-    currentReplicas = len(getCurrentPodNames(namespace))
+    # The function getData will return:
+    #                                       - Average Response Time
+    #                                       - The length of the dominant component
+    #                                       - The numerator used for the computation of the utilization metric
+    #                                       - The workload (i.e. number of requests received in our observation interval)          
+
+    avgResponseTime, queueLengthDominant, utilizationSum, workload = getData()
     
-    if avgResponseTime is None:
+    # Compute the parameters required by the agent (i.e. nInstances, pressure, queueLengthDominant, utilization, workload - See the ReadMe for a full explaination of them)
+    nInstances = len(getCurrentPodNames(namespace))
+    pressure = avgResponseTime / threshold if avgResponseTime != None else 0
+    utilization = utilizationSum / nInstances if nInstances else 0
 
-        replicas = currentReplicas - 1 if currentReplicas > 1 else 1
+
+
+    # Just for a better understanding during the checks, in theory we can just use observation and modify the function 'updatePodStatus' - Notice that we always have to pass observation in the HTTP Request
+    test =  {
+                    "n_instances": nInstances,
+                    "pressure": pressure,
+                    "avgResponseTime": avgResponseTime,
+                    "Threshold": threshold, 
+                    "queue_length_dominant": queueLengthDominant,
+                    "utilization": utilization,
+                    "workload": workload
+            }
+
+
+
+    observation = {
+                    "n_instances": nInstances,
+                    "pressure": pressure,
+                    "queue_length_dominant": queueLengthDominant,
+                    "utilization": utilization,
+                    "workload": workload
+                   }
+
+
+    # During the test happened that the request failed, we handle that case so as to mantain the very same number of pods if the agent fails for any kind of reason
+    try:
+
+        response = requests.post(agentURL, json = {'observation': observation}, timeout = 10)
+        response.raise_for_status()
+
+        try:
+
+            data = response.json()
+            action = data.get('action', -1)         # If 'action' key is missing
         
-        if currentReplicas == 1:
-            action = 'No Action'
+        except ValueError:
+           
+            action = -1
 
-        else: 
-            action = 'Shutdown a pod'
+    # Catch all requests exceptions (connection error, timeout, etc...)
+    except requests.RequestException as e:
+        action = -1
 
-    elif avgResponseTime > 0.6:
-        
-        replicas = currentReplicas + 1
-        action = 'Start a new pod'
-
-    else:
-        replicas = currentReplicas - 1 if currentReplicas > 1 else 1
-        action = 'Shutdown a pod'
-
-    updateReplicasNumber(deploymentName, namespace, replicas)
+    if action > 0:
+        updateReplicasNumber(deploymentName, namespace, action)
     
     #Move processed files to the AnalyzedPods folder
     moveAnalyzedFiles()
     
     # Update the pod status file with active, started and shutdown pods
-    updatePodStatus(namespace, avgResponseTime, action)
+    updatePodStatus(namespace, test, action)
 
 
 if __name__ == "__main__":
