@@ -24,7 +24,7 @@
         <stringProp name="TestPlan.comments">It defines how many users we have to perform the requests (Be sure to have enough users to keep up with timer)</stringProp>
       </com.blazemeter.jmeter.threads.concurrency.ConcurrencyThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Matrix Multiply - HTTP Request" enabled="true">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Matrix Multiply - HTTP Request">
           <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
           <stringProp name="HTTPSampler.port">80</stringProp>
           <stringProp name="HTTPSampler.path">/multiply</stringProp>
@@ -56,8 +56,35 @@
             </collectionProp>
           </HeaderManager>
           <hashTree/>
+          <BeanShellTimer guiclass="TestBeanGUI" testclass="BeanShellTimer" testname="Exponential Jitter Timer">
+            <stringProp name="filename"></stringProp>
+            <stringProp name="parameters"></stringProp>
+            <boolProp name="resetInterpreter">false</boolProp>
+            <stringProp name="script">// Mean delay in milliseconds (set it small to avoid interferences with the TST)
+double mean = 10;
+
+// Generate a uniform random number between 0 and 1
+double u = Math.random();
+
+// Exponential distribution formula
+long delay = (long)(-mean * Math.log(1 - u));
+
+log.info(&quot;Exponential delay applied: &quot; + delay + &quot; ms&quot;);
+
+// Set the delay for this sampler
+return delay;
+</stringProp>
+            <stringProp name="TestPlan.comments">This is used to make the inter-arrival time following an exponential behaviour</stringProp>
+          </BeanShellTimer>
+          <hashTree/>
         </hashTree>
-        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="Throughput Shaping Timer" enabled="true">
+          <collectionProp name="load_profile"/>
+          <!-- The workload will be added here -->
+          <stringProp name="TestPlan.comments">It defines the traffic shape (i.e. Request Per Second) at each time instant</stringProp>
+        </kg.apc.jmeter.timers.VariableThroughputTimer>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
           <boolProp name="ResultCollector.error_logging">false</boolProp>
           <objProp>
             <name>saveConfig</name>
@@ -95,14 +122,7 @@
         </ResultCollector>
         <hashTree/>
       </hashTree>
-      <kg.apc.jmeter.timers.VariableThroughputTimer guiclass="kg.apc.jmeter.timers.VariableThroughputTimerGui" testclass="kg.apc.jmeter.timers.VariableThroughputTimer" testname="Throughput Shaping Timer" enabled="true">
-        <collectionProp name="load_profile">
-        <!-- The Workload Data will be inserted here -->
-        </collectionProp>
-        <stringProp name="TestPlan.comments">It defines the traffic shape (i.e. Request Per Second) at each time instant</stringProp>
-      </kg.apc.jmeter.timers.VariableThroughputTimer>
-      <hashTree/>
-      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV File - Matrices">
+      <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="CSV File - Matrices" enabled="true">
         <stringProp name="delimiter">;</stringProp>
         <stringProp name="fileEncoding">US-ASCII</stringProp>
         <stringProp name="filename">/Users/fabioschiliro/Desktop/Multidisciplinary Project/MultidisciplinaryProject/JMeter/Matrices.csv</stringProp>

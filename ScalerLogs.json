@@ -79,3 +79,378 @@
         ]
     }
 }  
+
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------->           TESTS           <--------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+The agent was not connected in Test 1, this test has been done to check whether utilization and CPU Usage are similar or not
+
+- Test 1 and 2 are made using differnt matrices with differnt size
+
+Test 1:
+
+        "check_5": {
+                "timestamp": "03.05.2025_13:56:01",
+                "nInstances": 1,
+                "pressure": 2.3001897379393497,
+                "avgResponseTime": 2.3001897379393497,
+                "Threshold": 1.0,
+                "queueLengthDominant": 36213.78888996433,
+                "utilization": 0.032727301120733285,
+                "CPUUsage (Prometheus)": 0.17211627500000004,
+                "workload": 23.3,
+                "action": "No Action",
+                "active": [
+                    "matrix-multiply-d847c46c7-fft84"
+                ],
+                "startedPreviousCheck": [],
+                "shutdownPreviousCheck": []
+            }
+
+        "check_6": {
+                "timestamp": "03.05.2025_13:57:01",
+                "nInstances": 1,
+                "pressure": 0.0,
+                "avgResponseTime": 0,
+                "Threshold": 1.0,
+                "queueLengthDominant": 0,
+                "utilization": 0.0,
+                "CPUUsage (Prometheus)": 0.00019551124643942482,
+                "workload": 0,
+                "action": "No Action",
+                "active": [
+                    "matrix-multiply-d847c46c7-fft84"
+                ],
+                "startedPreviousCheck": [],
+                "shutdownPreviousCheck": []
+            }
+
+
+Test 2:
+
+        "check_3": {
+            "timestamp": "03.05.2025_14:27:04",
+            "nInstances": 1,
+            "pressure": 0.010092258453,
+            "avgResponseTime": 0.010092258453,
+            "Threshold": 1.0,
+            "queueLengthDominant": 0.729873314085002,
+            "utilization": 9.723504385e-05,
+            "CPUUsage (Prometheus)": 0.0006583059039206716,
+            "workload": 0.016666666666666666,
+            "action": "The number of pod will be set to 2!",
+            "active": [
+                "matrix-multiply-d847c46c7-mxl9p"
+            ],
+            "startedPreviousCheck": [
+                "matrix-multiply-d847c46c7-mxl9p"
+            ],
+            "shutdownPreviousCheck": [
+                "matrix-multiply-d847c46c7-fft84"
+            ]
+        },
+        "check_4": {
+            "timestamp": "03.05.2025_14:28:07",
+            "nInstances": 2,
+            "pressure": 5.125999649153228,
+            "avgResponseTime": 5.125999649153228,
+            "Threshold": 1.0,
+            "queueLengthDominant": 54757.388784426104,
+            "utilization": 0.026646669705849987,
+            "CPUUsage (Prometheus)": 0.07750482674329473,
+            "workload": 9.35,
+            "action": "The number of pod will be set to 4!",
+            "active": [
+                "matrix-multiply-d847c46c7-v9zz6",
+                "matrix-multiply-d847c46c7-mxl9p",
+                "matrix-multiply-d847c46c7-kxssf",
+                "matrix-multiply-d847c46c7-975pc"
+            ],
+            "startedPreviousCheck": [
+                "matrix-multiply-d847c46c7-v9zz6",
+                "matrix-multiply-d847c46c7-975pc",
+                "matrix-multiply-d847c46c7-kxssf"
+            ],
+            "shutdownPreviousCheck": []
+        },
+        "check_5": {
+            "timestamp": "03.05.2025_14:29:08",
+            "nInstances": 4,
+            "pressure": 0.006410121918,
+            "avgResponseTime": 0.006410121918,
+            "Threshold": 1.0,
+            "queueLengthDominant": 46.33450701971049,
+            "utilization": 5.642573041666666e-07,
+            "CPUUsage (Prometheus)": 0.00016903500443885363,
+            "workload": 0.016666666666666666,
+            "action": "The number of pod will be set to 1!",
+            "active": [
+                "matrix-multiply-d847c46c7-mxl9p",
+                "matrix-multiply-d847c46c7-kxssf",
+                "matrix-multiply-d847c46c7-975pc",
+                "matrix-multiply-d847c46c7-v9zz6"
+            ],
+            "startedPreviousCheck": [],
+            "shutdownPreviousCheck": []
+        },
+        "check_6": {
+            "timestamp": "03.05.2025_14:30:02",
+            "nInstances": 1,
+            "pressure": 0.0,
+            "avgResponseTime": 0,
+            "Threshold": 1.0,
+            "queueLengthDominant": 0,
+            "utilization": 0.0,
+            "CPUUsage (Prometheus)": 0.001125436803143601,
+            "workload": 0,
+            "action": "The number of pod will be set to 1!",
+            "active": [
+                "matrix-multiply-d847c46c7-mxl9p"
+            ],
+            "startedPreviousCheck": [],
+            "shutdownPreviousCheck": [
+                "matrix-multiply-d847c46c7-v9zz6",
+                "matrix-multiply-d847c46c7-kxssf",
+                "matrix-multiply-d847c46c7-975pc"
+            ]
+        },
+        "check_7": {
+            "timestamp": "03.05.2025_14:31:04",
+            "nInstances": 1,
+            "pressure": 4.932851431168712,
+            "avgResponseTime": 4.932851431168712,
+            "Threshold": 1.0,
+            "queueLengthDominant": 53315.317579220486,
+            "utilization": 0.018477459748683346,
+            "CPUUsage (Prometheus)": 0.10772283706833212,
+            "workload": 6.916666666666667,
+            "action": "The number of pod will be set to 4!",
+            "active": [
+                "matrix-multiply-d847c46c7-kjrmh",
+                "matrix-multiply-d847c46c7-ptc5g",
+                "matrix-multiply-d847c46c7-mxl9p",
+                "matrix-multiply-d847c46c7-fc49z"
+            ],
+            "startedPreviousCheck": [
+                "matrix-multiply-d847c46c7-ptc5g",
+                "matrix-multiply-d847c46c7-fc49z",
+                "matrix-multiply-d847c46c7-kjrmh"
+            ],
+            "shutdownPreviousCheck": []
+        }
+
+
+- Test 3, 4 and 5 are made using differnt matrices with the very same size
+
+Test 3:
+
+        "check_1": {
+        "timestamp": "04.05.2025_07:44:04",
+        "nInstances": 1,
+        "pressure": 0.01837065003118182,
+        "avgResponseTime": 0.01837065003118182,
+        "Threshold": 1.0,
+        "queueLengthDominant": 53.42376671479232,
+        "utilization": 0.00015499194461666667,
+        "CPUUsage (Prometheus)": 0.00023246546876909887,
+        "workload": 0.18333333333333332,
+        "action": "No Action",
+        "active": [
+            "matrix-multiply-d847c46c7-7b9j6"
+        ],
+        "startedPreviousCheck": [
+            "matrix-multiply-d847c46c7-7b9j6"
+        ],
+        "shutdownPreviousCheck": []
+    },
+    "check_2": {
+        "timestamp": "04.05.2025_07:45:02",
+        "nInstances": 1,
+        "pressure": 0.07230774402617002,
+        "avgResponseTime": 0.07230774402617002,
+        "Threshold": 1.0,
+        "queueLengthDominant": 530.277554396437,
+        "utilization": 0.0037767052653000033,
+        "CPUUsage (Prometheus)": 0.13510140816187027,
+        "workload": 8.333333333333334,
+        "action": "The number of pod will be set to 1!",
+        "active": [
+            "matrix-multiply-d847c46c7-7b9j6"
+        ],
+        "startedPreviousCheck": [],
+        "shutdownPreviousCheck": []
+    },
+    "check_3": {
+        "timestamp": "04.05.2025_07:46:04",
+        "nInstances": 1,
+        "pressure": 0.003168091177950657,
+        "avgResponseTime": 0.003168091177950657,
+        "Threshold": 1.0,
+        "queueLengthDominant": 44.99221030415779,
+        "utilization": 0.0005276083946833335,
+        "CPUUsage (Prometheus)": 0.02618228176137433,
+        "workload": 5.066666666666666,
+        "action": "The number of pod will be set to 4!",
+        "active": [
+            "matrix-multiply-d847c46c7-t9j48",
+            "matrix-multiply-d847c46c7-7b9j6",
+            "matrix-multiply-d847c46c7-7m875",
+            "matrix-multiply-d847c46c7-zsjhc"
+        ],
+        "startedPreviousCheck": [
+            "matrix-multiply-d847c46c7-t9j48",
+            "matrix-multiply-d847c46c7-7m875",
+            "matrix-multiply-d847c46c7-zsjhc"
+        ],
+        "shutdownPreviousCheck": []
+    },
+    "check_4": {
+        "timestamp": "04.05.2025_07:47:07",
+        "nInstances": 4,
+        "pressure": 0.0,
+        "avgResponseTime": 0,
+        "Threshold": 1.0,
+        "queueLengthDominant": 0,
+        "utilization": 0.0,
+        "CPUUsage (Prometheus)": 0.0001995470624081936,
+        "workload": 0,
+        "action": "The number of pod will be set to 1!",
+        "active": [
+            "matrix-multiply-d847c46c7-t9j48",
+            "matrix-multiply-d847c46c7-zsjhc",
+            "matrix-multiply-d847c46c7-7b9j6",
+            "matrix-multiply-d847c46c7-7m875"
+        ],
+        "startedPreviousCheck": [],
+        "shutdownPreviousCheck": []
+    }
+
+
+Test 4: (50 req) - (3 x 50 req)
+
+        "check_7": {
+            "timestamp": "04.05.2025_07:54:02",
+            "nInstances": 1,
+            "pressure": 0.007758848667179998,
+            "avgResponseTime": 0.007758848667179998,
+            "Threshold": 1.0,
+            "queueLengthDominant": 113.41010114314533,
+            "utilization": 0.00016246636703333336,
+            "CPUUsage (Prometheus)": 0.011250890207715131,
+            "workload": 1.6666666666666667,
+            "action": "The number of pod will be set to 1!",
+            "active": [
+                "matrix-multiply-d847c46c7-7b9j6"
+            ],
+            "startedPreviousCheck": [],
+            "shutdownPreviousCheck": []
+        },
+        "check_8": {
+            "timestamp": "04.05.2025_07:55:02",
+            "nInstances": 1,
+            "pressure": 0.00270654678348,
+            "avgResponseTime": 0.00270654678348,
+            "Threshold": 1.0,
+            "queueLengthDominant": 46.69110720791306,
+            "utilization": 6.365776061666667e-05,
+            "CPUUsage (Prometheus)": 0.003967055691973352,
+            "workload": 0.8333333333333334,
+            "action": "The number of pod will be set to 1!",
+            "active": [
+                "matrix-multiply-d847c46c7-7b9j6"
+            ],
+            "startedPreviousCheck": [],
+            "shutdownPreviousCheck": []
+        },
+        "check_9": {
+            "timestamp": "04.05.2025_07:56:03",
+            "nInstances": 1,
+            "pressure": 0.006873520215359998,
+            "avgResponseTime": 0.006873520215359998,
+            "Threshold": 1.0,
+            "queueLengthDominant": 81.73498017847872,
+            "utilization": 0.0002718846002500001,
+            "CPUUsage (Prometheus)": 0.020698130442725785,
+            "workload": 2.5,
+            "action": "The number of pod will be set to 1!",
+            "active": [
+                "matrix-multiply-d847c46c7-7b9j6"
+            ],
+            "startedPreviousCheck": [],
+            "shutdownPreviousCheck": []
+        }
+
+
+Test 5: (500 req) - (500 req) - (500 x 2 req)
+
+        "check_10": {
+                "timestamp": "04.05.2025_07:57:06",
+                "nInstances": 1,
+                "pressure": 0.0033276515007100004,
+                "avgResponseTime": 0.0033276515007100004,
+                "Threshold": 1.0,
+                "queueLengthDominant": 50.46091269960664,
+                "utilization": 0.0007544755933833328,
+                "CPUUsage (Prometheus)": 0.04094023925339364,
+                "workload": 8.333333333333334,
+                "action": "The number of pod will be set to 4!",
+                "active": [
+                    "matrix-multiply-d847c46c7-7b9j6",
+                    "matrix-multiply-d847c46c7-r268l",
+                    "matrix-multiply-d847c46c7-4sd7r",
+                    "matrix-multiply-d847c46c7-4rstf"
+                ],
+                "startedPreviousCheck": [
+                    "matrix-multiply-d847c46c7-r268l",
+                    "matrix-multiply-d847c46c7-4sd7r",
+                    "matrix-multiply-d847c46c7-4rstf"
+                ],
+                "shutdownPreviousCheck": []
+            },
+            "check_11": {
+                "timestamp": "04.05.2025_07:58:03",
+                "nInstances": 4,
+                "pressure": 0.004727856159200002,
+                "avgResponseTime": 0.004727856159200002,
+                "Threshold": 1.0,
+                "queueLengthDominant": 54.557191705420415,
+                "utilization": 0.0003041764100708335,
+                "CPUUsage (Prometheus)": 0.011732736052388962,
+                "workload": 8.333333333333334,
+                "action": "The number of pod will be set to 4!",
+                "active": [
+                    "matrix-multiply-d847c46c7-r268l",
+                    "matrix-multiply-d847c46c7-4sd7r",
+                    "matrix-multiply-d847c46c7-4rstf",
+                    "matrix-multiply-d847c46c7-7b9j6"
+                ],
+                "startedPreviousCheck": [],
+                "shutdownPreviousCheck": []
+            },
+            "check_12": {
+                "timestamp": "04.05.2025_07:59:03",
+                "nInstances": 4,
+                "pressure": 0.0035435106754189995,
+                "avgResponseTime": 0.0035435106754189995,
+                "Threshold": 1.0,
+                "queueLengthDominant": 54.127466688109976,
+                "utilization": 0.0003830711046958333,
+                "CPUUsage (Prometheus)": 0.007842425153217354,
+                "workload": 16.666666666666664,
+                "action": "The number of pod will be set to 6!",
+                "active": [
+                    "matrix-multiply-d847c46c7-4rstf",
+                    "matrix-multiply-d847c46c7-bvrzp",
+                    "matrix-multiply-d847c46c7-z6vmm",
+                    "matrix-multiply-d847c46c7-r268l",
+                    "matrix-multiply-d847c46c7-4sd7r",
+                    "matrix-multiply-d847c46c7-7b9j6"
+                ],
+                "startedPreviousCheck": [
+                    "matrix-multiply-d847c46c7-z6vmm",
+                    "matrix-multiply-d847c46c7-bvrzp"
+                ],
+                "shutdownPreviousCheck": []
+            }

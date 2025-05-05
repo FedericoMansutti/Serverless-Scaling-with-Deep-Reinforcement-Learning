@@ -31,7 +31,9 @@ spec:
             - name: AGENT_HOST                 # Put the service name of the agent     
               value: "dqn-agent"   
             - name: AGENT_PORT                 # Put the port in which teh agent is reachable 
-              value: "5000"             
+              value: "5000"  
+            - name: PROMETHEUS_URL                                                          # Put the link to the Prometheus Service
+              value: "http://prometheus-operated.monitoring.svc.cluster.local:9090"           
             volumeMounts:
             - name: results-volume
               mountPath: /app/results

@@ -132,6 +132,7 @@ pip install -r requirements.txt
    - Ensure you execute these commands in the given sequence to maintain proper resource dependencies
    - If you want to observe the effects of the scheduler in a clearer way, apply its manifest after some requests sent during the following steps
    - The scheduler can work if and only if the container associated to the RL Agent is actually running!
+   - With the actual implementation, the scheduler is using data taken from prometheus so you have to set it up before doing this (look at the section below to understand how to do it)
 <br><br>
 
 

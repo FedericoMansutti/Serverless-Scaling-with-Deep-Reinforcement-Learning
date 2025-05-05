@@ -10,12 +10,45 @@ from kubernetes import client, config
 RESULTS_DIR = "/app/results"
 ANALYZED_DIR = os.path.join(RESULTS_DIR, "AnalyzedPods")
 POD_STATUS_FILE = os.path.join(RESULTS_DIR, "podStatus.json")
+INTERVAL_CHECK = int(os.getenv("INTERVAL_CHECK", "60"))
+
+
+def getCPUUsage(prometheusURL, deployment, namespace):
+
+    interval = INTERVAL_CHECK
+
+    podRegex = f'{deployment}-.*'
+    promql = (
+                f'sum('
+                f'rate(container_cpu_usage_seconds_total{{'
+                f'namespace="{namespace}",pod=~"{podRegex}"'
+                f'}}[{interval}])'
+                f')'
+            )
+    
+    response = requests.get(
+                            f"{prometheusURL}/api/v1/query",
+                            params = {"query": promql},
+                            timeout = 10
+                        )
+    
+    response.raise_for_status()
+    data = response.json()["data"]["result"]
+
+    if not data:
+        return 0.0
+    
+    # The API returns a list but, since we summed it, expect one entry
+    cpuUsage = data[0]["value"][1]
+
+    return float(cpuUsage)
+
 
 
 def getData():
 
     # Take the info about the check rate for the computation of the utilization metric
-    interval = int(os.getenv("INTERVAL_CHECK", "60"))
+    interval = INTERVAL_CHECK
 
     # List all the JSON files in the results folder (ignoring the podStatus.json)
     filePattern = os.path.join(RESULTS_DIR, "*.json")
@@ -146,7 +179,7 @@ def updatePodStatus(namespace, observation, action):
         previousActive = set(history[f"check_{lastCheck}"].get("active", []))
         started = list(currentPods - previousActive)
         shutdown = list(previousActive - currentPods)
-        act = 'No Action' if action == -1 else f"The number of pod should be {action}"
+        act = 'No Action' if action == -1 else f"The number of pod will be set to {action}!"
 
     else:
 
@@ -164,6 +197,7 @@ def updatePodStatus(namespace, observation, action):
         "Threshold": observation['Threshold'], 
         "queueLengthDominant": observation['queue_length_dominant'],
         "utilization": observation['utilization'],
+        "CPUUsage (Prometheus)": observation['CPUUsage (Prometheus)'],
         "workload": observation['workload'],
         "action": act,
         "active": list(currentPods),
@@ -186,6 +220,7 @@ def main():
     deploymentName = os.environ.get("DEPLOYMENT_NAME", "matrix-multiply")
     threshold = float(os.getenv("PRESSURE_THRESHOLD", "0.6"))
     agentURL = f"http://{os.getenv('AGENT_HOST')}:{os.getenv('AGENT_PORT')}/action"
+    prometheusURL = os.getenv('PROMETHEUS_URL')
     
     # Process all the result files and compute the average response time
     # The function getData will return:
@@ -201,7 +236,9 @@ def main():
     pressure = avgResponseTime / threshold if avgResponseTime != None else 0
     utilization = utilizationSum / nInstances if nInstances else 0
 
-
+    # Notice that getCPUUsage returns the total CPU Usage in that timewindow, but we are interested in computing the average one!
+    cpuUsage = getCPUUsage(prometheusURL, deploymentName, namespace)
+    cpuUsage = cpuUsage / nInstances
 
     # Just for a better understanding during the checks, in theory we can just use observation and modify the function 'updatePodStatus' - Notice that we always have to pass observation in the HTTP Request
     test =  {
@@ -211,6 +248,7 @@ def main():
                     "Threshold": threshold, 
                     "queue_length_dominant": queueLengthDominant,
                     "utilization": utilization,
+                    "CPUUsage (Prometheus)": cpuUsage,
                     "workload": workload
             }
 
